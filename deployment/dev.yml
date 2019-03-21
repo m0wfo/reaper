@@ -1,8 +1,17 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: reaper
+  labels:
+    name: reaper
+
+---
+
 kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: reaper-user
-  namespace: default
+  namespace: reaper
 
 ---
 
@@ -25,7 +34,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: reaper-user
-  namespace: default
+  namespace: reaper
 roleRef:
   kind: Role
   name: reaper
@@ -37,8 +46,9 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: reaper
+  namespace: reaper
 spec:
-  schedule: "*/15 * * * *"
+  schedule: "*/5 * * * *"
   jobTemplate:
     spec:
       template:
@@ -46,7 +56,7 @@ spec:
           serviceAccountName: reaper-user
           containers:
             - name: reaper
-              image: m0wfo/reaper:1.0.0-SNAPSHOT
+              image: m0wfo/reaper:1.1.0
               env:
                 - name: LABEL_SELECTOR
                   value:  "branch, branch notin (develop, master)"
